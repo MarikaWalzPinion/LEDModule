@@ -30,7 +30,7 @@
 ## HAL usage & setup
 this Module uses 3 HAL functions
 - HAL_TIM_PWM_Start_DMA&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-> defined in "stm32u5xx_hal_tim.h"
-- HAL_TIM_PWM_PulseFinishedCallback&emsp;-> defined in "stm32u5xx_hal_tim.h", this needs to be manually overwritten; will be autocalled
+- HAL_TIM_PWM_PulseFinishedCallback&emsp;-> defined in "stm32u5xx_hal_tim.h", but manually overwritten in LEDModule.c
 - HAL_TIM_PWM_Stop_DMA&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;-> defined in "stm32u5xx_hal_tim.h"
 
 
@@ -38,14 +38,6 @@ this Module uses 3 HAL functions
 
 USER INCLUDE:<br/>
 #include "LEDModule.h"
-
-USER CODE: this HAL function has to be overwritten:<br/>
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {<br/>
-&emsp;&emsp;LEDModule *module = LEDModule_GetActiveInstance();<br/>
-&emsp;&emsp;if (module && htim->Instance == TIM17) {<br/>
-&emsp;&emsp;&emsp;&emsp;HAL_TIM_PWM_Stop_DMA(htim, TIM_CHANNEL_1);<br/>
-&emsp;&emsp;}<br/>
-}
 
 MAIN FUNCTION:<br/>
 // Get default config (default is hardcoded: htim17 and GPDMA1_Channel10)<br/>
