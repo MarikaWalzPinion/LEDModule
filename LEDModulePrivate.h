@@ -8,7 +8,7 @@
   * @copyright   Pinion GmbH <2025>
   ******************************************************************************
   */ 
-  
+
 #ifndef LEDMODULEPRIVATE_H
 #define LEDMODULEPRIVATE_H 
 
@@ -17,12 +17,13 @@
 #endif
 
 
-/* =============================== INCLUDES ================================ */
+/* ============================== INCLUDES ============================== */
 #include <string.h>
 #include <stdint.h>
 #include "LEDModule.h"
 
-/* =============================== FUNCTIONS ================================ */
+/* ============================== FUNCTIONS ============================== */
+
 /**
   * @brief init function for the LED Object
   * 
@@ -33,6 +34,30 @@
   * 
   */
 void LEDModule_LED_init(LEDModule *self);
+
+
+/**
+  * @brief getter Function for HCLK Clock Frequency - will be aligned with Timer Counter Period for synchronized DutyCycles
+  * 
+  * @param   void                 - value used by function
+  * @param   HCLKFreq             - variable used as input and changed by function
+  * 
+  * @return  void
+  * 
+  */
+uint32_t GetHCLKFreqMhZ(void);
+
+
+/**
+  * @brief synchronizes Timer Counter Period with HCLK Clock
+  * 
+  * @param   void                 - value used by function
+  * @param   HCLKFreq             - variable used as input and changed by function
+  * 
+  * @return  void
+  * 
+  */
+ void setTimerCounterPeriod (void);
 
 
 /**
@@ -69,6 +94,7 @@ void LEDModule_SendData(LEDModule *self);
   * 
   */
 LEDModule *LEDModule_GetActiveInstance_Internal(void);
+
 
 // This block is obligatory here as this is only included by `MyModule.c`
 #else // LEDMODULEPRIVATE_H

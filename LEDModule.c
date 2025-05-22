@@ -8,10 +8,9 @@
   * 
   */
 
-/* ============================ INCLUDES =========================== */
+/* ============================== INCLUDES ============================== */
 #include "LEDModule.h"
 #include "LEDModulePrivate.h"
-
 
 static LEDModule_Class ledClass = {
     .LED_init = LEDModule_LED_init,
@@ -19,7 +18,7 @@ static LEDModule_Class ledClass = {
     .LED_SendData = LEDModule_SendData
 };
 
-/* ========================== PUBLIC FACTORY ========================= */
+/* ============================== PUBLIC FACTORY ============================== */
 
 LEDModule LEDModule_factory(LEDModule_Class *classOverride, LEDModule_Configuration config) {
     LEDModule module;
@@ -39,7 +38,15 @@ LEDModule_Configuration LEDModule_GetDefaultConfiguration(void) {
     };
 }
 
-/* ============================ PUBLIC GETTER =========================== */
+/* ============================== PUBLIC GETTER ============================== */
 LEDModule *LEDModule_GetActiveInstance(void) {
     return LEDModule_GetActiveInstance_Internal();
 } 
+
+/* ============================== PUBLIC HAL OVERWRITE ============================== */
+void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim) {
+  LEDModule *module = LEDModule_GetActiveInstance();
+  if (module && htim->Instance == TIM17) {
+      HAL_TIM_PWM_Stop_DMA(htim, TIM_CHANNEL_1);
+  }
+}
