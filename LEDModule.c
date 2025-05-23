@@ -47,7 +47,6 @@ void LightUpLED(LEDModule *self, uint8_t red, uint8_t green, uint8_t blue, uint8
     HAL_TIM_PWM_DeInit(self->config.htim);
     HAL_TIM_PWM_Init(self->config.htim);
     LEDModule_SendDataToLED(self);
-    HAL_Delay(1000);
 }
 
 
