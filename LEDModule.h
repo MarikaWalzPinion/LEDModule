@@ -32,31 +32,33 @@ typedef struct LEDModule_Class LEDModule_Class;
 
 /* ============================== CONFIG ============================== */
 struct LEDModule_Configuration {
-    TIM_HandleTypeDef *htim; // default: htim17
-    DMA_HandleTypeDef *hdma; // default: handle_GPDMA1_Channel10
+    TIM_HandleTypeDef *htim; // tested with: htim17
+    DMA_HandleTypeDef *hdma; // tested with: handle_GPDMA1_Channel10
+    uint32_t tim_channel;    // tested with: TIM_CHANNEL_1
 };
 
 /* ============================== CLASS ============================== */
 struct LEDModule_Class {
     void (*LED_init)(LEDModule *);
-    void (*LED_SetColor)(LEDModule *, uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness);
-    void (*LED_SendData)(LEDModule *);
+    void (*LED_SetColorData)(LEDModule *, uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness);
+    void (*LED_SendDataToLED)(LEDModule *);
 };
 
 /* ============================== MAIN ============================== */
 struct LEDModule {
     LEDModule_Configuration config;
     LEDModule_Class *class;
-    uint8_t dutyCycleHigh; // default: 90
-    uint8_t dutyCycleLow; //  default: 10
+    uint8_t dutyCycleHigh;
+    uint8_t dutyCycleLow;
     uint32_t color; // 24bit data, that holds the RGB Value -> together with 30bits 'break' we get the length of the pwmData (just 24bits 'break' was too short)
     uint16_t LEDModule_pwmData[54]; // array of pulse width information, the length of the high for each duty cycle per bit
 };
 
 /* ============================== Public API ============================== */
 LEDModule LEDModule_factory(LEDModule_Class *classOverride, LEDModule_Configuration config);
-LEDModule_Configuration LEDModule_GetDefaultConfiguration(void);
+LEDModule_Configuration LEDModule_GetDefaultConfiguration(TIM_HandleTypeDef *htim, DMA_HandleTypeDef *hdma);
 LEDModule *LEDModule_GetActiveInstance(void); 
+void LightUpLED(LEDModule *self, uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness);
 
 #endif // LEDMODULE_H
 

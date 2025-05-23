@@ -57,7 +57,7 @@ uint32_t GetHCLKFreqMhZ(void);
   * @return  void
   * 
   */
- void setTimerCounterPeriod (void);
+ void setTimerCounterPeriod(TIM_HandleTypeDef *htim);
 
 
 /**
@@ -69,7 +69,7 @@ uint32_t GetHCLKFreqMhZ(void);
   * @return  void
   * 
   */
-void LEDModule_SetColor(LEDModule *self, uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness);
+void LEDModule_SetColorData(LEDModule *self, uint8_t red, uint8_t green, uint8_t blue, uint8_t brightness);
 
 
 /**
@@ -81,7 +81,7 @@ void LEDModule_SetColor(LEDModule *self, uint8_t red, uint8_t green, uint8_t blu
   * @return  void
   * 
   */
-void LEDModule_SendData(LEDModule *self);
+void LEDModule_SendDataToLED(LEDModule *self);
 
 
 /**

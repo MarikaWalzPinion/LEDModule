@@ -1,4 +1,19 @@
-## LED Module
+
+# Template for NUCLEO-U575ZI-Q with target STM32U575ZIT6Q
+
+## Prerequisites
+- The openOCD version `0.12.0` is required. Installation details are provided in the [docs](https://github.com/PinionGmbH/docs/blob/main/EmbeddedDevelopment.md#update-openocd). This is due to the fact, that for this MCU the config files are missing.
+- Project is based on [GNU Toolchain 13.2](https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-arm-none-eabi.tar.xz)
+- CMake should at least be of version 3.22. For more debug capabilities, it is recommended to use version 3.27.
+- Install pre-commit hooks with the `Initialize commit hooks` task 
+
+## How to run and build?
+1. `cmake --preset <configuration_preset_name>` 
+2. go to directory were build files were written to
+3. `cmake -- build . --target all`
+<br/>
+
+## LED Module to light up a WS2812 LED with Timer (PWM & DMA)
   ******************************************************************************
   * @file        LEDModule.h
   * @brief       This module can send data from a STM32 MCU to a WS2812 LED, using a Timer (with PWM and DMA)
@@ -9,23 +24,23 @@
   ******************************************************************************
 
 ## General Information
-- the default configuration for this module expects Timer17 and GPDMA1_Channel10 for a NUCLEO-U575ZI-Q MCU
-- the LED_SetColor function asks for red, blue, green and brightness (0-255 range)
+- the configuration for this module requires a Timer and a DMA Channel
+- the LightUpLED function asks for red, blue, green and brightness (0-255 range)
 - the standalone files for the Module can be found here: https://github.com/MarikaWalzPinion/LEDModule
 
 
 ## MCU & CubeMX setup
-- this Module requires one cable-connection from the WS2812 LED to the TIM17 Pinout on the MCU (Pin: PA_7 on NUCLEO-U575ZI-Q)<br/>
-- this Module reads the HCLK Clock Frequency and adapts the Timer17 Counter Period accordingly<br/>
+- this Module requires one cable-connection from the WS2812 LED to the Timer Pin on the MCU<br/>
+- this Module reads the HCLK Clock Frequency and adapts the Timer Counter Period accordingly<br/>
   Warning: the HCLK Frequency should be between 48MHz - 148MHz<br/>
-  (outside of that range the Timings get imprecise, which leads to visible malfunctions of the LED)<br/>
-- Timer: activate TIM17 (PWM Generation CH1):<br/>
-- DMA:&ensp;go to GPDMA1<br/>
-&emsp;&emsp;&emsp;Mode: 'Channel 10': 'Standard Request Mode'<br/>
-&emsp;&emsp;&emsp;CH10: 'Request': 'TIM17_CH1'<br/>
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'Direction': 'Memory to Peripheral'<br/>
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'Source Data Setting': Enabled + Half Word <br/>
-&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'Destination Data Setting': Disabled + Half Word
+  (outside of that range the Timings get imprecise, which leads to visible malfunctions of the LED)<br/><br/>
+- Timer: activate a Timer and set a Channel to PWM Generation (tested for 'TIM17' with 'PWM Generation CH1')<br/>
+- DMA: activate a '2 Words Internal FIFO' Channel in 'Standard Request Mode'<br/>
+  &emsp;configure the Channel like this:<br/>
+&emsp;&emsp;&emsp;'Request': --select your Timer PWM Channel--<br/>
+&emsp;&emsp;&emsp;'Direction': 'Memory to Peripheral'<br/>
+&emsp;&emsp;&emsp;'Source Data Setting': Enabled + Half Word <br/>
+&emsp;&emsp;&emsp;'Destination Data Setting': Disabled + Half Word
 
 
 ## HAL usage & setup
@@ -39,14 +54,11 @@ USER INCLUDE:<br/>
 #include "LEDModule.h"
 
 MAIN FUNCTION:<br/>
-// Get default config (default is hardcoded: htim17 and GPDMA1_Channel10)<br/>
-LEDModule_Configuration config = LEDModule_GetDefaultConfiguration();
+// Get configuration: pass the active Timer & DMA Channel<br/>
+LEDModule_Configuration config = LEDModule_GetDefaultConfiguration(&htim17, &handle_GPDMA1_Channel10);
 
-// Create module instance with default class behavior<br/>
+// Create module instance<br/>
 LEDModule led = LEDModule_factory(NULL, config);
 
-// Set a color: red, blue, green, brightness<br/>
-led.class->LED_SetColor(&led, 255, 255, 255, 255);
-
-// Start sending the data via PWM+DMA<br/>
-led.class->LED_SendData(&led);
+// Send a Color to the LED: pass red, blue, green and brightness<br/>
+LightUpLED(&led, 0, 0, 0, 255);
